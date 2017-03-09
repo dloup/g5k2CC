@@ -3,37 +3,43 @@
 set -x
 set -e
 
-SOURCE_OS=${SOURCE_OS:-"ubuntu"}
-OUTPUT_IMG=${2:-out.qcow2}
-
-if [ -z $1 ]; then
+if [ $# -eq 0 ]; then
+  echo "Needs at least 2 args : bash g5k2CC [ubuntu|debian] [source image] (optional)[output name]"
+  exit 1
+fi
+if [ $1 != "ubuntu" ] && [ $1 != "debian" ]; then
+  echo "First arg must be either ubuntu or debian"
+  exit 1
+else
+  SOURCE_OS=$1
+fi
+if [ -z $2 ]; then
   echo "Needs g5k input image in argument"
   exit 1
 else
-  SOURCE_IMG=$1
+  SOURCE_IMG=$2
 fi
 
-### UBUNTU CONVERTION SCRIPT ###
+OUTPUT_IMG=${3:-out.qcow2}
+
+cp $SOURCE_IMG $OUTPUT_IMG
+# Preparing image for OpenStack deployment
+virt-sysprep -a $OUTPUT_IMG
+virt-customize -a $OUTPUT_IMG --install cloud-init
+virt-customize -a $OUTPUT_IMG --install cloud-guest-utils
+
+# Fetch Chameleon Cloud configuration
 if [ $SOURCE_OS = "ubuntu" ]; then
- cp $SOURCE_IMG $OUTPUT_IMG
- # Preparing image for OpenStack deployment
- virt-sysprep -a $OUTPUT_IMG
- virt-customize -a $OUTPUT_IMG --install cloud-init
- virt-customize -a $OUTPUT_IMG --install cloud-guest-utils
+  git clone https://github.com/ChameleonCloud/CC-Ubuntu14.04.git /tmp/CC_git
+  SCRIPTS_PATH="/tmp/CC_git/elements/chameleon-common/install.d"
 
- # Fetch Chameleon Cloud configuration
- SCRIPTS_PATH="chameleon-common/install.d"
- sed -i 's/^set -o pipefail/#set -o pipefail/g' $SCRIPTS_PATH/*
-
- # Apply Chameleon Cloud configuration
- virt-customize -a $OUTPUT_IMG --run $SCRIPTS_PATH/03-ntp
- virt-customize -a $OUTPUT_IMG --run $SCRIPTS_PATH/07-cloud-cfg
-
-### DEBIAN CONVERTION SCRIPT ###
 elif [ $SOURCE_OS = "debian" ]; then
-  #TODO
-  echo "Todo"
-else
-  echo "Source OS \"$SOURCE_OS\" not supported yet"
-  exit 1
+  SCRIPTS_PATH="debian_conf/elements/chameleon-common/install.d"
 fi
+
+# Apply Chameleon Cloud configuration
+sed -i 's/^set -o pipefail/#set -o pipefail/g' $SCRIPTS_PATH/*
+virt-customize -a $OUTPUT_IMG --run $SCRIPTS_PATH/03-ntp
+virt-customize -a $OUTPUT_IMG --run $SCRIPTS_PATH/07-cloud-cfg
+
+rm -rf /tmp/CC_git
