@@ -26,8 +26,8 @@ users:
 
 # If this is set, 'root' will not be able to ssh in and they 
 # will get a message to login instead as the above $user (ubuntu)
-disable_root: true
-ssh_pwauth:   0
+disable_root: false
+ssh_pwauth:   1
 
 # This will cause the set+update hostname module to not operate (if true)
 preserve_hostname: false
@@ -97,7 +97,7 @@ cloud_final_modules:
 # (not accessible to handlers/transforms)
 system_info:
    # This will affect which distro class gets used
-   distro: ubuntu
+   distro: debian
    # Default user name + that default users groups (if added/used)
    default_user:
      name: cc
@@ -114,17 +114,11 @@ system_info:
    package_mirrors:
      - arches: [i386, amd64]
        failsafe:
-         primary: http://archive.ubuntu.com/ubuntu
-         security: http://security.ubuntu.com/ubuntu
-       search:
-         primary:
-           - http://%(ec2_region)s.ec2.archive.ubuntu.com/ubuntu/
-           - http://%(availability_zone)s.clouds.archive.ubuntu.com/ubuntu/
-           - http://%(region)s.clouds.archive.ubuntu.com/ubuntu/
-         security: []
+         primary: http://ftp.debian.org/debian
+         security: http://security.debian.org
      - arches: [armhf, armel, default]
        failsafe:
-         primary: http://ports.ubuntu.com/ubuntu-ports
-         security: http://ports.ubuntu.com/ubuntu-ports
+         primary: http://ftp.debian.org/debian
+         security: http://security.debian.org
    ssh_svcname: ssh
 EOF
