@@ -7,4 +7,4 @@ set -eu
 set -o pipefail
 
 # Configure auto-login
-sudo sed -i 's/exec \/sbin\/getty -8 38400 tty1.*/exec \/sbin\/getty -8 38400 tty1 -a cc/g' /etc/init/tty1.conf
+sudo sed -i 's/ExecStart=-\/sbin\/agetty --noclear \%I \$TERM/ExecStart=-\/sbin\/agetty --autologin cc --noclear \%I \$TERM/g' /etc/systemd/system/getty.target.wants/getty\@tty1.service
