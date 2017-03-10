@@ -24,11 +24,11 @@ fi
 OUTPUT_IMG=${3:-out.qcow2}
 
 ## Preparing image for OpenStack deployment ##
-#cp $SOURCE_IMG $OUTPUT_IMG
-#virt-sysprep -a $OUTPUT_IMG
-#virt-customize -a $OUTPUT_IMG --install cloud-init
-#virt-customize -a $OUTPUT_IMG --install cloud-guest-utils
-#virt-customize -a $OUTPUT_IMG --run-command 'echo "datasource_list: [ OpenStack, Ec2, None ]" > /etc/cloud/cloud.cfg.d/91-set-datasources.cfg'
+cp $SOURCE_IMG $OUTPUT_IMG
+virt-sysprep -a $OUTPUT_IMG
+virt-customize -a $OUTPUT_IMG --install cloud-init
+virt-customize -a $OUTPUT_IMG --install cloud-guest-utils
+virt-customize -a $OUTPUT_IMG --run-command 'echo "datasource_list: [  Ec2, None ]" > /etc/cloud/cloud.cfg.d/91-set-datasources.cfg'
 
 ## Remove blocking g5k configurations ##
 virt-customize -a $OUTPUT_IMG --run 'rm_g5k_conf.sh'
