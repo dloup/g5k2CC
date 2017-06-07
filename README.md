@@ -1,6 +1,6 @@
 # g5k2CC
 This script allow you to port Grid'5000 images to Chameleon.
-It needs a Grid'5000 images in qcow2 as input, and will give a qcow2 that can be uploaded and deployed on Chameleon Cloud.
+It needs a Grid'5000 images in qcow2 or tgz as input, and will give a qcow2 that can be uploaded and deployed on Chameleon Cloud.
 
 ## Requirement
 This scripts need guestfish (for virt-customize command)
